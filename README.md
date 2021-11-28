@@ -155,3 +155,102 @@ ng build --prod         // Generar carpeta de distribución optimizada para prod
 npm i -g http-server                                    // instalar librería de forma global
 http-server dist/nombre-carpeta-generada-proyecto       // montar el proyecto en el servidor local
 ```
+
+## Componentes
+
+Es una combinación de diferentes elementos (Template, Estilos, Lógica)
+- Vista (HTML)
+- Binding (comunicación entre elementos - Data Binding y Event Binding)
+- Directivas (enlazar contenido)
+- CSS
+- Clase (lógica del componente conformada por propiedades y métodos)
+- Metadatos (Son propiedades que forman parte del cuerpo de un @Decorador, Los decoradres le indican a Angular que función desempeña cada clase declarada en nuestro proyecto: Componente, Servicio, Módulo, Directiva, Pipe)
+
+```
+Componente = Plantilla / Estilos + Clase + Metadatos
+
+ng g c nombreDelComponente      // Generar un componente
+```
+
+- Todos los paquetes de angular se deben de importar de @angular/...
+- Los decoradores se encuentran definidos en el paquete de @angular/core
+- En el mundo de Angular, la parte más básica y elemental es el componente, un componente puede estar compuesto por otros sub-componentes, y así sucesivamente.
+- Los componentes para ser renderizados en las vistas, deben pertenecen siempre a un módulo (deben estar declarados). La forma correcta de trabajar con ángular es dividir nuestra aplicación en módulos, y esos modulos deben estar compuestos por diversos componentes. Los componentes que son usados por diversos módulos a lo largo de nuestra aplicación deben estar registrados en un módulo compartido generalmente llamado shared, mismo que declara los componentes que gestiona y exporta explicitamente aquellos componentes que desea compartir con otros módulos.
+
+#### Estilos en componentes
+
+- Angular usa CSS estandar, pero podemos usar algún procesador
+- Permite definir estilos por componente, lo que hace posible un diseño modular (los estilos declarados en un componente no interfieren con los estilos declarados en otros componentes, es decir, encapsula los estilos de los componentes)
+
+```
+styles: ['h1 {color: red;}', 'p {font-size: 14px;}', '.title {font-family: Arial; text-align: center}']    // Arreglo de declaraciones de estilo. (inline)
+
+styleUrls: ['./app.component.css']   // Arreglo de archivos de estilos (archivos separados)
+```
+
+- Se recomienda hacer uso de estilos **inline** cuando el componente sea básico y no requiera un estilo sumamente elaborado
+
+#### Plantillas en componentes
+
+- Permite distribuir los diferentes elementos que componen nuestra vista: Layout, HTML, Binding (enlace de propiedades o eventos), Directivas
+- Plantillas inline, requieren el uso de backticks. **Esta forma es recomendada para componentes con estructura básica**
+```
+template: `
+    <div>
+        <h1>Angular</h1>
+    </div>
+`,
+```
+
+- Plantillas separada en un archivo
+```
+templateUrl: './app.component.html'
+``` 
+
+## Angular Router
+- Permite al usuario navegar de una vista a otra (componentes de página) en la aplicación y renderizar su contenido en la ventana del navegador
+- El módulo de RouterModule contiene directivas **routerLink, routerLinkActivate** que permiten inyectar un comportamiento más avanzado a nuestros enlaces al momento de navegar, es decir, evitan que la ventana del navegador se recargue.
+- El módulo RouterModule contiene un componente que permite visualizar el contenido de una vista (componente de página) asociada a una ruta **router-outlet**
+- Para definir un conjunto de rutas principales para nuestra aplicación, es necesario declarar un arreglo de objetos de ruta y registrarlo en el RouterModule, el cual debe ser exportado, e importado en el módulo principal de nuestra aplicación
+
+```
+const routes: Routes = [
+    {
+        path: '',
+        component: HomeComponent
+    }
+]
+
+RouterModule.forRoot(routes)
+```
+
+- En proyectos complejos, se recomienda que cada módulo que contiene páginas para nuestra app, se le asocie un router. El cual es un módulo que contiene la declaración de rutas para ese modulo, mismas que deben ser declaradas en el RouterModule como rutas hijas, e importadas en dicho módulo
+```
+ng g m carpetaModulo/nombreModuloRouting --flat
+ng g m carpetaModulo --routing      // Genera el módulo y su respectivo archivo para la definición de rutas
+
+const routes: Routes = [
+    {
+        path: '',
+        component: LoginComponent
+    }
+]
+
+RouterModule.forChild(routes)
+```
+
+- Los módulos que tienen asociados un esquema de rutas, son importados en la definición del esquema de rutas principales de la aplicación mediante la técnica del LazyLoad. De esta forma sus rutas quedan declaradas como rutas hijas de la aplicación bajo un path padre/ruta-hija, y en ocasiones un estilo de layout diferente gracias a la definición de un componente padre para las respectivas rutas hijas. **Para ver el contenido de las rutas hijas en el Layout este debe definir en su template el componente** router-outlet. (Vistas anidadas)
+
+```
+const routes: Routes = [
+    {
+        path: '',
+        component: HomeComponent
+    },
+    {
+        path: 'auth',
+        component: AuthLayoutComponent,
+        loadChildren: () => import('./auth/auth.module.ts).then(m => AuthModule)
+    }
+]
+```
