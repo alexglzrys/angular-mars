@@ -1,0 +1,27 @@
+<h2>{{ title }}</h2>
+
+<table class="table">
+    <thead>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Fecha de lanzamiento</th>
+        <th>Precio</th>
+        <th>Calificación</th>
+        <th>Portada</th>
+        <th>Acciones</th>
+    </thead>
+    <tbody>
+        <tr *ngFor="let course of courses">
+            <td><img [src]="course.imageUrl" [alt]="course.name" (mouseover)="generateZoom($event)" class="d-block img-fluid" width="150"></td>
+            <td>{{ course.name }}</td>
+            <td>{{ course.description }}</td>
+            <td>{{ course.startDate }}</td>
+            <td>{{ course.price | currency }}</td>
+            <td>{{ course.rating }}</td>
+            <td>
+                <button (click)="editCourse(course)" class="btn btn-sm btn-warning me-2"><i class="fas fa-edit"></i> Editar</button>
+                <button (click)="deleteCourse(course)" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
+            </td>
+        </tr>
+    </tbody>
+</table>

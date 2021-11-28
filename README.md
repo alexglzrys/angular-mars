@@ -254,3 +254,101 @@ const routes: Routes = [
     }
 ]
 ```
+
+### Instalar librerías de terceros
+La instalación se hace de forma tradicional mediante NPM, sin embargo, si la librería instalada requiere de estilos CSS personalizados, es necesario vincularlos a nuestra aplicación mediante la edición del archivo **angular.json**
+
+Otra forma de hacerlo es importar los CSS de forma tradicional desde nuestro archivo **styles.css** mediante el uso de imports **@import "~bootstrap/dist/main.css"**
+
+- Se recomienda la primer opción **angular.json** ya que al momento de empaquetar nuestra App, dichos archivos también serán optimizados. Sin embargo, es importante recordar que esta opción requiere volver a transpilar la aplicación (ng serve, ng build)
+
+```
+npm i bootstrap
+npm install --save @fortawesome/fontawesome-free
+
+--- archivo styles.css
+@import '~bootstrap/dist/css/bootstrap.min.css';
+
+--- archivo angular.json (path build)
+"styles": [
+    "node_modules/bootstrap/dist/css/bootstrap.min.css",
+    "src/styles.scss"
+],
+```
+
+### Data Binding
+
+Permite enlazar los datos declarados en la clase de nuestro componente con el DOM (Template o vista de nuestro componente) **Propiedades**, y comunicar información del template hacia la clase de nuestro componente mediante el uso de **Eventos**
+
+- Esto lo hace de forma unideraccional
+- Property Binding = Clase -> Template
+- Event Binding = Template -> Clase
+
+
+El binding en Angular se puede aplicar de distintas formas:
+
+#### Interpolación
+La clase de nuestro componente define propiedades o atributos, las cuales para ser mostradas en la vista, se hace mediante el uso de **Expresones de Plantilla**
+
+Con el uso de **interpolación** podemos también hacer expresiones JS
+
+```
+titulo: string = 'Hola mundo'
+
+<p>{{ titulo }}</p>
+<p>La suma de 1 + 3 es {{ 1 + 3 }}</p>
+```
+
+#### Property Binding
+
+Es un tipo de binding para vincular el valor de las propiedades definidas en nuestra Clase, como valores de atributos declarados en las etiquetas de nuestra plantilla
+
+```
+<img [src]="pathImage" [alt]="titulo + ' - EDTeam'">
+<a [href]="linkURL" [title]="curso.title" [disabled]="curso.status">Más información</a>    
+```
+
+#### Event Binding
+
+Es un tipo de Binding, para comunicar a la Clase sobre cambios o acciones realizadas en la vista (Template) por el usuario
+
+- Los eventos nativos de JS son invocados sin el prefijo on
+- Los eventos nativos pueden ser de distinta naturaleza, las acciones del usuario tienen que ver con MouseEvent, pero existen otros tipos de acciones que se relacionan con otro tipo de eventos (arrastrar y soltar, que la página este lista, touch, imagenes cargadas) **https://developer.mozilla.org/es/docs/Web/Events**
+
+```
+guardarRegistro() {
+    // lógica para guardar el registro
+}
+
+editarCurso(curso: any) { }
+
+generarZoom(event: MouseEvent) { }
+
+
+<button (click)="guardarRegistro()">Save</button>
+<button (click)="editarCurso(curso)>Editar este curso</button>
+<img [src]="pathImage" [alt]="titulo" (mouseover)="generarZoom($event)">
+```
+
+#### Binding condicional en atributos, clases y estilos
+
+```
+<div [attr.arial-label]="help">Ayuda</div> // Binding en atributo
+
+<div [class.special]="esEspecial"></div> // Binding en clase
+
+<div [style.color]="esEspecial ? 'red' : 'green'"></div> // Binding en estilo
+```
+
+## Pipes
+
+Un Pipe toma un dato de entrada y lo transforma para generar una nueva salida
+
+- Se establece un formato para la salida
+- Soporta parámetros
+- Se pueden encadenar, el flujo siempre va de izquierda a derecha
+
+```
+<p>Mi nacimiento es {{ nacimiento | date }}</p>
+<p>{{ nacimiento | date | lowercase }}</p>
+```
