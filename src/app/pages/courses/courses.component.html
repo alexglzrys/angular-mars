@@ -1,6 +1,15 @@
+<div class="container">
 <h2>{{ title }}</h2>
+<div *ngIf="courses.length; else message">
+<div class="row my-4">
+    <div class="col-md-2">Filtrar por:</div>
+    <div class="col-md-6">
+        <input type="text" #filtro [(ngModel)]="textoFiltro">
+        <span class="ms-2">{{ textoFiltro }}</span>
+    </div>
+</div>
 
-<table class="table">
+<table class="table" >
     <thead>
         <th>Nombre</th>
         <th>Descripción</th>
@@ -19,9 +28,14 @@
             <td>{{ course.price | currency }}</td>
             <td>{{ course.rating }}</td>
             <td>
-                <button (click)="editCourse(course)" class="btn btn-sm btn-warning me-2"><i class="fas fa-edit"></i> Editar</button>
-                <button (click)="deleteCourse(course)" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
+                <!-- Escuchar los eventos personalizados edit y delete. -->
+                <app-course-action [course]="course" (edit)="updateCourse($event)" (delete)="removeCourse($event)"></app-course-action>                
             </td>
         </tr>
     </tbody>
 </table>
+</div>
+<ng-template #message>
+    <p class="alert alert-info">En este momento no hay cursos disponibles</p>
+</ng-template>
+</div>

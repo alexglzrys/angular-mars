@@ -352,3 +352,89 @@ Un Pipe toma un dato de entrada y lo transforma para generar una nueva salida
 <p>Mi nacimiento es {{ nacimiento | date }}</p>
 <p>{{ nacimiento | date | lowercase }}</p>
 ```
+
+## Directivas
+
+Son elementos HTML personalizados que permiten extender el lenguaje HTML. Generalmente se les vé como etiquetas (las cuales representan el contenido de un componente), pero tambien se pueden usar como atributos personalizados
+
+- Directivas personalizadas (custom)
+- Directivas incorporadas en el framework (built-in)
+
+```
+<ed-root></ed-root>
+<ed-calendario></ed-calendario>
+```
+
+#### Directivas estructurales
+
+Manipulan la estructura del DOM, agregando, eliminando o actualizando elementos.
+
+```
+*ngIf
+*ngFor
+*ngSwitch   
+
+<div *ngIf="curso">{{ curso.name }}</div>
+<ul>
+    <li *ngFor="let heroe of heroes">{{ heroe.name}}</li>
+</ul>
+<div [ngSwitch]="mes">
+    <p *ngSwitchCase="'Enero'">Iniciando el año</p>
+    <p *ngSwitchDefault>En que planeta vives</p>
+</div>
+```
+
+## Propiedades @Input
+
+Permite a un componente padre enviar información a sus componentes hijos por medio de la definición de un decorador @Input en la clase del componente hijo (propiedad personalizada)
+
+```
+<componente-padre>
+    <hijo [datos]="informacion"></hijo>
+</componente-padre>
+
+// Componente hijo
+@Input() datos: string;     // La info. se almacena en la propiedad datos
+```
+
+## Propiedades @Output
+
+Permite a un componente hijo enviar información a su componente padre por medio de la definición de un decorador @Output en la case del componente hijo y el uso de un emisor de eventos personalizados (EventEmmiter)
+
+- El EventEmmiter puede o no enviar una carga útil como información del evento **< TipoDeEvento >**
+- EventEmmiter debe ser importado desde @angular/core 
+
+```
+// Componente hijo
+@Output() edit: EventEmitter<Course> = new EventEmitter<Course>();
+
+// En algun método del componente hijo, se emite el evento personalizado edit con su carga util (el curso)
+this.edit.emit(informacionDelCurso)
+
+
+<componente-padre>
+    <hijo (edit)="editarCurso($event)"></hijo>
+</componente-padre>
+
+// Componente padre
+editarCurso(mi_curso: Course) {
+    delete(mi_curso)
+}
+```
+
+## @ViewChild
+
+Permite acceder a elementos HTML declarados en la vista (template), desde la clase de nuestro componente.
+Después de ello, se puede acceder a todas sus propiedades nativas para manipularlas al clásico estilo JS
+
+- Para identificar al elemento al cuál se quiere acceder, se necesita de una **variable de referencia de plantilla**
+
+- Si se desea acceder desde el momento que se renderiza el componente, es necesario declaraar toda la lógica en el ciclo de vida **AfterViewInit**
+
+```
+<input type="text" #varreferencia>
+
+@ViewChild('varreferencia', {static: false}) micampo: ElementRef;
+
+this.micampo.nativeElement.value = 'UN NUEVO CONTENIDO'
+```
