@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Event, Router } from '@angular/router';
 import { Course } from '../../interfaces/course';
+import { CourseService } from '../../services/course.service';
 
 @Component({
   selector: 'app-courses',
@@ -11,36 +12,41 @@ export class CoursesComponent implements OnInit, AfterViewInit {
 
   @ViewChild('filtro', {static: false}) filtro!: ElementRef;
   title: string = 'Listado de cursos';
-  textoFiltro: string = '';
-  courses: Course[] = [
-    {
-      id: 1,
-      name: 'Angular Desde Cero',
-      description: 'Aprende Angular como si estuvieras en primero',
-      price: 799.50,
-      rating: 4.9,
-      imageUrl: 'assets/images/courses/angular.jpg',
-      startDate: 'Enero 15, 2021'
-    },
-    {
-      id: 2,
-      name: 'TypeScript Desde Cero',
-      description: 'Aprende TypeScript 4 como si estuvieras en primero',
-      price: 450.00,
-      rating: 4.3,
-      imageUrl: 'assets/images/courses/typescript.jpg',
-      startDate: 'Julio 09, 2021'
-    }
-  ]
+  //textoFiltro: string = '';
+  private _txtFilter: string = '';
+  courses!: Course[]
 
-  constructor(private router: Router) { }
+  /**
+   * Inspeccionar el cambio de valores de una propiedad mediante getters y setters
+   * para activar una determinada lógica en consecuencia
+   */
+  set textoFiltro(t: string) {
+    this._txtFilter = t;
+    console.log('Texto filtro:',t)
+    // Filtrar cursos
+    // Si existe búsqueda, filtramos, caso contrario retornamos todo el listado de cursos
+    this.courses = this._txtFilter ? this.filtrarCursos(t) : this.courseService.getCourses()
+  }
+
+  get textoFiltro() {
+    return this._txtFilter
+  }
+
+  constructor(private router: Router,
+              private courseService: CourseService) { }
 
   ngOnInit(): void {
     //this.deleteAllCourses()
+    this.courses = this.courseService.getCourses()
   }
 
   ngAfterViewInit() {
     this.filtro.nativeElement.value = 'Cursos Angular'
+  }
+
+  filtrarCursos(t: string): Course[] {
+    // Pasar a minuscula el nombre del curso y verificar si el término se encuentra en alguna posición dentro del string
+    return this.courses.filter((couse: Course) => couse.name.toLowerCase().indexOf(t.toLowerCase()) >= 0)
   }
 
   generateZoom(event: MouseEvent) {

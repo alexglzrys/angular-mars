@@ -438,3 +438,68 @@ Después de ello, se puede acceder a todas sus propiedades nativas para manipula
 
 this.micampo.nativeElement.value = 'UN NUEVO CONTENIDO'
 ```
+
+## Módulos
+
+Permiten agrupar un conjunto de carácteristicas o código que este relacionado con nuestra aplicación.
+
+- Configura el inyector y el compilador para organizar contenido relacionado
+- Es una clase de Typescript marcada con el decorador @NgModule
+- Consolida componentes, directivas, pipes en bloques de funcionalidad
+- Se suelen enfocar en: caracteristicas de la aplicación, colección común o un conjunto de utilidades, o un dominio de la lógica de negocio
+- Agrupan servicios
+- Se pueden cargar al inicio o usando estrategias como Lazy Loading para cargarlos bajo demanda
+
+```
+declarations: ['Define los componentes, Directivas, Pipes que agrupa el módulo']
+
+imports: ['Listado de módulos cuyos elementos van a necesitar los componentes del modulo actual']
+
+providers: ['Los servicios que los componentes de este modulo necesitan para poder trabajar']
+
+exports: ['Los elementos que desea compartir el modulo actual con otros módulos']
+```
+
+## Inyección de Dependencias
+
+- Es un patron de diseño orientado a objetos
+- Permite el paso de objetos como **dependencias**
+- Los objetos se pueden pasar a componentes
+- Pueden estar disponibles en toda la aplicación
+- El patrón permite la creación de instancias
+
+Generalmente se le ve cuando se solicita la llamada de un servicio dentro de un componente.
+
+- LoggerService
+- LoginService
+- PopupService
+- EnvironmentService
+
+La inyección de una dependencia se hace a través del constructor, lo que genera que se cree una instancia de dicho servicio, misma que estará disponible en toda la clase (private), o en el template (public)
+
+```
+constructor(private myService: MyService) {
+
+}
+```
+
+## Servicios
+
+Es una clase con un propósito bien definido
+
+```
+export class MyService {
+    log(message: string): string {
+        return message;
+    }
+}
+```
+
+## Buenas prácticas en Angular
+
+- Conversiones para estructura de archivos
+- Principio: Single Responsability
+- Convenciones de nombre (naming)
+- Estructura de una aplicación
+- Buenas prácticas sobre componentes, directivas, servicios (servicios de datos, o utilitarios)
+- Lifecycle Hooks
