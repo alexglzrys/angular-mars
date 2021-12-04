@@ -7,6 +7,7 @@ import { CoursesComponent } from './pages/courses/courses.component';
 import { CourseActionComponent } from './components/course-action/course-action.component';
 import { CourseEditComponent } from './pages/course-edit/course-edit.component';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { FormsModule } from '@angular/forms';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

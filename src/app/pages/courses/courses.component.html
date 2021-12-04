@@ -1,6 +1,6 @@
 <div class="container">
 <h2>{{ title }}</h2>
-<div *ngIf="courses.length; else message">
+<div *ngIf="courses; else message">
 <div class="row my-4">
     <div class="col-md-2">Filtrar por:</div>
     <div class="col-md-6">
@@ -38,4 +38,7 @@
 <ng-template #message>
     <p class="alert alert-info">En este momento no hay cursos disponibles</p>
 </ng-template>
+<div *ngIf="messageError">
+    <p class="alert alert-info">{{ messageError }}</p>
+</div>
 </div>

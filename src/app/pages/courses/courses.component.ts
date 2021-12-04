@@ -1,5 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Event, Router } from '@angular/router';
+import { EMPTY, of, Subscription } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { Course } from '../../interfaces/course';
 import { CourseService } from '../../services/course.service';
 
@@ -14,7 +16,8 @@ export class CoursesComponent implements OnInit, AfterViewInit {
   title: string = 'Listado de cursos';
   //textoFiltro: string = '';
   private _txtFilter: string = '';
-  courses!: Course[]
+  courses!: Course[] | never[]
+  messageError!: string;
 
   /**
    * Inspeccionar el cambio de valores de una propiedad mediante getters y setters
@@ -25,7 +28,14 @@ export class CoursesComponent implements OnInit, AfterViewInit {
     console.log('Texto filtro:',t)
     // Filtrar cursos
     // Si existe búsqueda, filtramos, caso contrario retornamos todo el listado de cursos
-    this.courses = this._txtFilter ? this.filtrarCursos(t) : this.courseService.getCourses()
+    //this.courses = this._txtFilter ? this.filtrarCursos(t) : this.courseService.getCourses();
+    if (this._txtFilter) {
+      this.courses = this.filtrarCursos(t)
+    } else {
+      this.courseService.getCourses().subscribe(courses => {
+        this.courses = courses
+      })
+    }
   }
 
   get textoFiltro() {
@@ -37,11 +47,29 @@ export class CoursesComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     //this.deleteAllCourses()
-    this.courses = this.courseService.getCourses()
+    //this.courses = this.courseService.getCourses()
+    this.courseService.getCourses()
+    .pipe(
+      tap(courses => console.log('Cursos', courses)),
+      catchError(error => {
+        this.messageError = error;
+        // Seleccionar estrategia de error
+        // Atrapar y Reemplazar el error como un Observable vacío
+        //return EMPTY
+        // Atrapar y Reemplazar el error como un arreglo vacío  
+        return of([])
+      })
+    )
+    .subscribe(courses => {
+      this.courses = courses;
+    })
   }
 
   ngAfterViewInit() {
-    this.filtro.nativeElement.value = 'Cursos Angular'
+    
+     // this.filtro.nativeElement.value = 'Cursos Angular';
+    
+      
   }
 
   filtrarCursos(t: string): Course[] {

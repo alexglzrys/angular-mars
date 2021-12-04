@@ -649,3 +649,111 @@ async function testObservable() {
 
 testObservable()
 ```
+
+## Arquitectura Cliente-Servidor
+
+Arquitectura en la que varios clientes solicitan y reciben servicios de un servidor centralizado.
+
+- Los clientes proporcionan una interfaz para la solicitud de servicios y mostrar los resultados
+- Los servidores esperan las solicitudes para responder a los mismos
+- Normalmente un servidor provee una interfaz de conexión estandarizada y transparente a los clientes (universal)
+
+### REST y RESTfull
+
+#### REST
+- Representational State Transfer
+- Es un patrón de arquitectura para la creación de servicios Web (Especificación)
+- Considera restricciones para su arquitectura (Cliente-Servidor, Stateless, Cacheable, Uniform Interface, Layered System)
+
+#### RESTfull
+
+- Se usa para referirse a servicios Web que implementan la aquitectura REST
+- Podemos decir que se basan en capas: (Request Handler **GET/POST/PUT/DELETE**, Service Handler **Proceso para generar respuestas JSON, XML**, Database Handler **Operaciones con recursos de base de datos**)
+
+### Métodos HTTP
+
+HTTP define un conjunto de **métodos de petición** para indicar las acciones a realizar sobre un recurso
+Estos métodos suelen llamarse tambíén **verbos HTTP**
+
+- GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
+
+Las RESTful APIs permiten ejecutar operaciones CRUD
+- CREATE, READ, UPDATE, DELETE
+
+### Peticiones HTTP en Angular
+
+La mayoria de las aplicaciones Front-End se comunican con los servicios Back-End a través del protocolo HTTP
+
+Navegadores modernos admiten dos APIs para estas solicitudes
+
+- XMLHttpRequest
+- Fetch API (reciente)
+
+Angular provee un cliente denominado HttpClient, el cual ofrece un API HTTP simplificado para aplicaciones Angular basado en XMLHttpRequest
+
+**Este cliente retorna siempre un Observable**
+
+Se recomienda usar este cliente dentro de un servicio, para separar conceptos o responsabilidades en nuestra App, con el objetivo de reutilizar (inyectar) el servicio en otros componentes.
+
+```
+// Módulo para peticiones HTTP
+HttpClientModule
+
+// Inyectar servicio
+HttpClient
+
+// Servicio
+getDatos(): Observable<Datos> {
+    return this.http.get<Datos>('/api/endpoint');
+}
+
+// Componente
+mostrarDatos() {
+    this.datosServices.getDatos().suscribe(respuesta => {
+        this.datos = respuesta
+    })
+}
+```
+
+### Manejo de Errores
+
+- ¿Que sucede si la petición al servidor falla?
+- ¿Que pasa si tenemos una conexión intermitente?
+
+**HTTPClient retorna un objeto de error** que contiene mayor información con respecto al error
+
+- Es ideal dar una retroalimentación genérica al usuario acerca del error
+- Mostrar el objeto de error que retorna el servidor no es una buena idea.
+
+```
+getDatos(): Observable<Datos> {
+    return this.http.get<Datos>('api/endpoint').pipe(
+        catchError(this.manejarError)
+    )
+}
+
+private manejarError(error: HttpErrorResponse) {
+    if (error.error instaceof ErrorEvent) {
+        // Error en el lado del cliente
+        // Ocurrio un error error.error.message
+    } else {
+        // Error en el lado del servidor
+        // Backend con error error.status, error.error
+    }
+    // Retornan un error como Observable
+    return throwError('Error inesperado')
+}
+```
+
+Estrategias:
+
+- Capturar el error y reemplazar (Catch and Replace)
+- Capturar el error y relanzar (Catch and Rethrow)
+
+```
+// Operador of
+catchError(error => of([]))     // Reemplazar el error por otra cosa
+
+// Relanzar
+catchError(error => throwError(error))  // Relanzar el error
+```
