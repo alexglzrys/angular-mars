@@ -503,3 +503,149 @@ export class MyService {
 - Estructura de una aplicación
 - Buenas prácticas sobre componentes, directivas, servicios (servicios de datos, o utilitarios)
 - Lifecycle Hooks
+
+## Asincronía
+
+Ocurrencia de eventos independientes del flujo principal del programa, así como la manera de manejar dichos eventos.
+
+- Java: el flujo principal del programa se ejecuta en el **hilo principal**, y los eventos independientes del flujo principal, **generan nuevos hilos** de ejecución en paralelo
+
+- JavaScript: corre en un solo hilo de ejecucion. Otros eventos se manejan usando **asyncrhronus non-blocking I/O model**. El código se ejecuta de forma secuencial, y las operaciones de I/O no son secuenciales (depende de la implementación)
+
+```
+console.log('primero')
+setTimeout(() => { 
+    console.log('me ejecuto después de 2 segundos') 
+    }, 2000)
+console.log('segundo')
+```
+
+### Síncrono VS Asíncrono
+
+Síncrono: La ejecución del código es secuencial, una después de la otra.
+
+Asíncrono: La ejecución del código no se bloquea, si se tiene una función asíncrona y en seguida más instrucciones, el proceso continua con su ejecución.
+
+### Promesas
+
+Es un **objeto** que representan la abstracción del resultado de una operación asincrona
+Dicho resultado puede estar disponible en el momento o en un futuro
+- Puede contener un resultado válido
+- Puede contener un error
+
+```
+let promesa = new Promise((resolve, reject) => {
+    resolve('felicidades')
+})
+
+promesa.then((mensaje) => {
+    console.log('Resultado: ', mensaje)
+})
+
+let promesa_dos = new Promise((resolve, reject) => {
+    reject('error en el proceso')
+})
+
+promesa_dos.then((mensaje) => {
+    console.log('Resultado: ', mensaje)
+}).catch((error) =>{
+    console.log('Error: ', error)
+})
+
+// Encadenar promesas
+
+promesa.then((mensaje) => {
+  console.log('Felicidades', mensaje)
+    // En este punto se retorna la siguiente promesa
+  return promesa_dos
+}).then((msg) => {
+  console.log('Promesa 2', msg)
+}).catch((error) => {
+  console.log('Error', error)
+})
+```
+
+### Patrón Observer
+
+Patron de diseño de software
+
+- Observable: El objeto o entidad que se desea observar en busca de nuevos cambios
+- Observer: Los clientes que fungen como observadores u oyentes a cualquier cambio del objeto o entidad de observación
+
+### Programación Reactiva
+
+Es un paradigma para la programación asíncrona
+- Hace referencia al procesamiento de un **flujo de datos de manera asíncrona**
+- **ReactiveX** es un API para programación asíncrona con flujos observables. Disponible para varios lenguajes de programación
+- En programación reactiva, **todo es un flujo de datos**
+
+### RxJS y Observables
+
+- Extensiones Reactivas (librerías para la programación reactiva) para JavaScript
+- Provee funciones utilitarias para la creación y el manejo de Observables
+
+Se pueden usar para:
+
+- Convertir código existente asíncrono (promesas) en observables
+- Iterar sobre los valores en flujos de datos (convertirlos a otros tipos de datos)
+- Mapear valores a diferentes tipos
+- Filtrar flujos de datos
+- Combinar múltiples flujos de datos
+
+**Los Observables son especialmente útiles para procesar multiples entradas de datos**, ya que una promesa se usa para valores simples
+
+### Observable
+
+- RxJS provee una implementación de un tipo Observable
+- RxJS también provee funciones para crear nuevos Observables
+- Dichas funciones simplifican su proceso de creación para eventos, promesas y otros
+
+```
+import { from } from 'rxjs'
+import { of } from 'rxjs'
+import { map } from 'rxjs/operators'
+
+const datos = from(fetch('api/datos'))
+
+datos.suscribe({
+    next(respuesta) { console.log(respuesta) },
+    error(err) { console.error(err) },
+    complete() { console.info('completado') }
+})
+
+const nums = of(1,2,3)
+const cuadrados = nums.pipe(
+    map((val: number) => val * val)
+)
+
+cuadrados.suscribe(x => console.log(x))
+
+```
+
+Ejemplo que conviete una promesa en Observable
+
+```
+import { from } from "rxjs"
+
+async function testObservable() {
+    // Esperar hasta que se resuelva la promesa 
+  const users = await fetch('https://randomuser.me/api/?results=5')
+    // Serializar los datos de la respuesta de la promesa en un objeto json y convertir ese objeto en un Observable
+  const datos = from(users.json())
+
+    // Suscripción al Observable
+  datos.subscribe({
+    next(respuesta) {
+      console.log('Respuesta', respuesta.results)
+    },
+    error(error) {
+      console.log('Error', error)
+    },
+    complete() {
+      console.log('Completado')
+    }
+  })
+}
+
+testObservable()
+```
