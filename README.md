@@ -757,3 +757,155 @@ catchError(error => of([]))     // Reemplazar el error por otra cosa
 // Relanzar
 catchError(error => throwError(error))  // Relanzar el error
 ```
+
+## Manejo de Formularios
+
+¿Que se puede hacer con formularios?
+
+- Iniciar sesión en una aplicación
+- Actualizar perfil de usuario
+- Ingresar los datos de un pedido online
+- Otras tareas de ingreso de datos
+
+**Angular proporciona dos enfoques para manejar entradas de usuario a través de formularios**
+
+En ambos casos se efectpua:
+
+- Captura de eventos de entrada
+- Validación de entrada de usuario
+- Creación de un modelo de formulario
+- Creación de un modelo de datos para actualizar y detectar cambios
+
+- **Formulario basados en Plantillas (template driven forms)**
+- Formulario simples (sin mucha lógica o control de validación)
+- Se requiere importar el **módulo FormsModule**
+```
+<input id="nombre" name="nombre" required minlength="4" [(ngModel)]="nombre" #nombre="ngModel">
+
+La plantilla #nombre, es una variable que permite verificar el estado del input (espejo), o poder validarlo desde la plantilla. Es una instancia de un formControl
+
+// es invalido y (esta sucio || ya fue tocado)
+nombre.invalid && (nombre.dirty || nombre.touched) ?
+
+nombre.errors.required  // requerido
+nombre.errors.minlength // debe tener al menos 4 caracteres
+```
+- **Formularios reactivos (reactive forms)**
+
+
+## Formularios basados en Plantillas
+
+Angular permite verificar el estado de un formulario a través de los siguientes criterios
+
+- ¿El formulario ha sido visitado?
+- ¿El formulario ha sido modificado?
+- ¿El formulario es válido?
+
+```
+VERDAD --- FALSE
+
+// Formulario Visitado (tocado)
+touched --- untouched
+
+// Formulario modificado (llenado)
+dirty --- pristine
+
+// Formulario válido
+valid --- invalid
+
+<form #registerCourseForm="ngForm">
+    <input type="text" name="name" id="name" [(ngModel)]="myCourse.name" required class="form-control" placeholder="Ingrese nombre del curso">
+</form>
+<pre>
+    Formulario valido: {{ registerCourseForm.form.valid }}
+    Formulario invalido: {{registerCourseForm.form.invalid}}
+
+    Formulario tocado: {{ registerCourseForm.form.touched }}
+    Formulario no tocado: {{ registerCourseForm.form.untouched }}
+
+    Formulario sin modificar (limpio): {{registerCourseForm.form.pristine }}
+    Formulario modificado (sucio): {{ registerCourseForm.form.dirty}}
+</pre>
+```
+
+### Acceder al estado del formulario desde la clase
+
+Se usa el decorador **@ViewChild()**
+
+```
+// Capturar el formulario (ngForm) via variable de plantilla 
+@ViewChild('variablePantilla') form: FormControl;
+
+onSubmit() {
+    if (this.form.valid) {
+        this.form.reset()
+    }
+}
+```
+
+- **FormControl** es un objeto que permite rastrear el valor y estado de validación de un control de formulario.
+- Implementa la mayor parte de la funcionalidad básica para acceder al valor, estado de validación, interacciones de usuarios y eventos.
+
+### Validadores
+
+- Los formularios basados en plantillas agregan los mismos atributos de validación que un formulario HTML **nativo**
+- Angular usa directivas para hacer coincidir estos atributos con funciones de validación del propio framework
+
+```
+required
+minlength
+maxlength
+```
+
+### Mensajes de Error de Validación
+
+- Identificar el campo de formulario mediante una variable de plantilla y como valor asociar ngModel **#name="ngModel"**
+- El estado de un campo de formulario es idéntico al estado de todo el formulario, es decir, existen las mismas propiedades para su evaluación
+
+```
+<form #registerCourseForm="ngForm">
+    <input type="text" name="name" id="name" [(ngModel)]="myCourse.name" required #name="ngModel" class="form-control" placeholder="Ingrese nombre del curso">
+    
+    // El campo debe ser invalido, y además. Debe estar sucio ó en su caso debío de haber sido tocado, para considerar mostrar el error
+    <span *ngIf="name.invalid && (name.dirty || name.touched)">El campo es requerido</span>
+</form>
+```
+
+### Clases CSS de control
+
+Angular refleja automáticamente muchas propiedades de control en el elemento de formulario **como clases CSS**. Es decir, inyecta automáticamente clase CSS con base al estado del formulario/campo
+
+- Se puede usar estas clases para dar un estilo de acuerdo al estado del formulario/campo
+
+```
+.ng-valid
+.ng-invalid
+
+.ng-pristine
+.ng-dirty
+
+.ng-untouched
+.ng-touched
+
+.ng-pending
+
+
+input.ng-invalid.ng-touched {
+    border: 1px solid red;
+}
+
+input.ng-valid.ng-touched {
+    border: 1px solid teal;
+}
+```
+
+### Two Way Data Binding
+
+Vincular datos en dos vías. Se hace mediante **ngModel**
+Cualquier cambio que se haga en el modelo desde la plantilla, se refleja en la clase del componente y viceversa.
+
+```
+<input type="url" name="image" class="form-control" [(ngModel)]="myCourse.imageUrl">
+
+{{ myCourse | json }}
+```

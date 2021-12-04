@@ -1,0 +1,54 @@
+
+<div class="container-fluid">
+    <h4>Registrar curso</h4>
+    <form #registerCourseForm="ngForm">
+        <div class="mb-3">
+            <label for="name">Nombre</label>
+            <input type="text" name="name" id="name" [(ngModel)]="myCourse.name" required #name="ngModel" class="form-control" placeholder="Ingrese nombre del curso">
+            <!-- Se considera mostrar el error cuando:
+            Es inválido "y" que el usuario ya lo haya tocado (hecho click sobre el) "ó" que haya escrito o borrado algo en el -->
+            <ng-container *ngIf="name.invalid && (name.dirty || name.touched)">
+                <span class="text-danger mt-1" style="font-size: .8rem;">El nombre es un dato requerido</span>
+            </ng-container>
+        </div>
+        <div class="mb-3">
+            <label for="description">Descripción</label>
+            <input type="text" name="description" id="description" [(ngModel)]="myCourse.description" required minlength="10" #description="ngModel" class="form-control" placeholder="Ingrese descripción del curso">
+            <ng-container *ngIf="description.invalid && (description.dirty || description.touched)">
+                <!-- Declarar tantos IF's como validaciones tenga aplicado el control de formulario -->
+                <span *ngIf="description.errors?.required" class="text-danger mt-1" style="font-size: .8rem;">La descripción es un dato requerido</span>
+                <span *ngIf="description.errors?.minlength" class="text-danger mt-1" style="font-size: .8rem;">La descripción debe tener al menos 10 caracteres</span>
+                <pre>{{ description.errors | json }}</pre>
+            </ng-container>
+        </div>
+        <div class="mb-3">
+            <label for="price">Precio</label>
+            <input type="number" name="price" id="price" [(ngModel)]="myCourse.price" required min="100" #price="ngModel" class="form-control" placeholder="Ingrese precio del curso">
+            <ng-container *ngIf="price.invalid && (price.dirty || price.touched)">
+                <span *ngIf="price.errors?.required" class="text-danger mt-1" style="font-size: .8rem;">El precio es un dato requerido</span>
+            </ng-container>
+        </div>
+        <div class="mb-3">
+            <label for="image">URL Imagen</label>
+            <input type="url" name="image" id="image" class="form-control" [(ngModel)]="myCourse.imageUrl" placeholder="Ingrese URL de imagen del curso">
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="active">
+            <label class="form-check-label" for="active">Curso Activo</label>
+          </div>
+          <!-- Deshabilitar el botón si el formulario es invalido "ó" si el usuario no ha tocado alguno de sus campos -->
+          <button type="submit" class="btn btn-primary" [disabled]="registerCourseForm.form.invalid || registerCourseForm.form.untouched" (click)="registrarCurso()">Registrar curso</button>
+    </form>
+    <div class="my-4">
+        <pre>
+            Formulario valido: {{ registerCourseForm.form.valid }}
+            Formulario invalido: {{registerCourseForm.form.invalid}}
+
+            Formulario tocado: {{ registerCourseForm.form.touched }}
+            Formulario no tocado: {{ registerCourseForm.form.untouched }}
+
+            Formulario sin modificar (limpio): {{registerCourseForm.form.pristine }}
+            Formulario modificado (sucio): {{ registerCourseForm.form.dirty}}
+        </pre>
+    </div>
+</div>

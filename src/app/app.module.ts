@@ -8,13 +8,15 @@ import { CourseActionComponent } from './components/course-action/course-action.
 import { CourseEditComponent } from './pages/course-edit/course-edit.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from "@angular/common/http";
+import { CourseCreateComponent } from './pages/course-create/course-create.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CoursesComponent,
     CourseActionComponent,
-    CourseEditComponent
+    CourseEditComponent,
+    CourseCreateComponent
   ],
   imports: [
     BrowserModule,
