@@ -769,16 +769,17 @@ catchError(error => throwError(error))  // Relanzar el error
 
 **Angular proporciona dos enfoques para manejar entradas de usuario a través de formularios**
 
-En ambos casos se efectpua:
+En ambos casos se efectúa:
 
 - Captura de eventos de entrada
 - Validación de entrada de usuario
 - Creación de un modelo de formulario
 - Creación de un modelo de datos para actualizar y detectar cambios
 
-- **Formulario basados en Plantillas (template driven forms)**
+**Formulario basados en Plantillas (template driven forms)**
 - Formulario simples (sin mucha lógica o control de validación)
 - Se requiere importar el **módulo FormsModule**
+- Prácticamente la lógica de validación se encuentra concentrada en la plantilla
 ```
 <input id="nombre" name="nombre" required minlength="4" [(ngModel)]="nombre" #nombre="ngModel">
 
@@ -790,7 +791,20 @@ nombre.invalid && (nombre.dirty || nombre.touched) ?
 nombre.errors.required  // requerido
 nombre.errors.minlength // debe tener al menos 4 caracteres
 ```
-- **Formularios reactivos (reactive forms)**
+**Formularios reactivos (reactive forms)**
+- Formularios con mucha lógica y control de validación
+- La lógica y configuración del formulario se encuentra concentrada en la clase del componente.
+- Proveen un enfoque basado en modelos de datos para el manejo de entradas de usuario
+- Se requiere importar el **módulo ReactiveFormsModule**
+- Detrás de maquinas, los formularios reactivos trabajan con **Observables** para detectar cambios en los valores de sus campos, o su respectiva validación 
+```
+import {} from '@angular/forms';
+
+name = new FormControl(');
+
+<input type="text" [formControl]="name">
+```
+
 
 
 ## Formularios basados en Plantillas
@@ -908,4 +922,107 @@ Cualquier cambio que se haga en el modelo desde la plantilla, se refleja en la c
 <input type="url" name="image" class="form-control" [(ngModel)]="myCourse.imageUrl">
 
 {{ myCourse | json }}
+```
+
+## Formularios Reactivos
+- La propiedad **name** de los formularios no tiene cavida en los formularios reactivos, por tanto se debe evitar
+- Las propiedades netivas de **validación HTML** no tienen cavida en los formularios reactivos, por tanto se deben evitar, y su especificación se hace a través de la definición del estado inicial del formulario reactivo (en la clase del componente)
+
+Agrupar controles de formulario
+```
+courseCreateForm!: FormGroup;
+
+...
+
+// Los detalles del curso puede contener más información
+this.courseCreateForm = new FormGroup({
+    name: new FormControl(null),
+    description: new FormControl(null),
+    price: new FormControl(null),
+    details: new FormGroup({
+        teacher: new FormControl(null),
+        duration: new FormControl(null),
+    }),
+    url: new FormControl(null),
+    active: new FormControl(true)
+})
+
+...
+
+<form [formGroup]="courseCreateForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+        <label for="name">Nombre</label>
+        <input type="text" id="name" class="form-control" placeholder="Ingrese nombre del curso" formControlName="name">
+    </div>
+
+    ...
+
+```
+
+### Validación en Formularios reactivos
+
+- Validadores pre-construidos en Angular (min, max, required, email, minLength, maxLength, pattern)
+- Validadores personalizados
+- **Las validaciones se especifican en la construcción del formulario reactivo, no en el template para cada campo**
+- Angular automáticamente inyecta clases de CSS para cada campo de formulario que debe ser validado, esto brinda la oportunidad de preparar un diseño apropiado para controles de formulario que no son válidos.
+```
+// Clase del componente
+name: new FormControl(null, Validators.required),
+price: new FormControl(null, [Validators.required, Validators.min(200)]),
+....
+
+
+// Visualización e inspección del contorl de formulario en el DOM
+<input type="number" formcontrolname="price" class="form-control ng-dirty ng-touched ng-valid">
+....
+```
+- Para mostrar los errores de validación en la plantilla, se hace referencia primero al formulario reactivo seguido del control a inspeccionar.
+- Se debe inspeccionar que el control sea **invalid**, y además que este sucio o ya halla sido tocado **dirty || touched**
+```
+<ng-container *ngIf="courseCreateForm.get('name')?.invalid && (courseCreateForm.get('name')?.touched || courseCreateForm.get('name')?.dirty)">
+    <p class="text-danger mt-2">El nombre es un dato requerido</p>
+</ng-container>
+
+// Multiples validaciones a un control de formulario
+<ng-container *ngIf="courseCreateForm.get('price')?.invalid && (courseCreateForm.get('price')?.touched || courseCreateForm.get('price')?.dirty)">
+    <!-- Cuando se tiene más de una validación es necesario inspeccionar cual de ellas es la que detonó el error -->
+    <p class="text-danger mt-2" *ngIf="courseCreateForm.get('price')?.hasError('required')">El precio es un dato requerido</p>
+    <p class="text-danger mt-2" *ngIf="courseCreateForm.get('price')?.hasError('min')">El precio debe ser de al menos $200 pesos</p>
+</ng-container>
+```
+
+### Validaciones personalizadas
+- Son funciones que retornan un valor nulo si la lógica de validación pasa, o retornan un objeto si hay error en la validación
+```
+// Además de las funciones de validación pre-construidas, podemos especificar las propias
+url: new FormControl(null, [Validators.required, this.domainValid('amazon.com')]),
+
+
+// Validaciones personalizadas
+domainValid(word: string): ValidatorFn {
+// Siempre debe retornar una función, la cual retorne un valor null (si la validación pasa) o un objeto con una clave y valor (si la validación falla)
+    // La función siempre recibe el control de formualario a validar
+    return (control: AbstractControl): {[key: string]: any} | null => {
+        // Cuerpo o lógica de validación
+        if (control.value !== null && control.value.includes(word)) {
+        // La validación falla si el valor del control de formulario contiene la palabra que se pasa como parámetro a la función Validadora
+        return {
+            // La clave que podemos usar en el template para saber si el error causado, es de este tipo de validación (dominio invalido)
+            'domaininvalid': true
+        }
+        } else {
+        // La validación pasó. 
+        // En este caso el valor del campo no contiene el texto especificado, o simplemente no se ha escrito nada en el hasta el momento
+        return null;
+        }
+    }
+}
+
+
+<input type="url" id="image" class="form-control" placeholder="Ingrese URL de imagen del curso" formControlName="url">
+<ng-container *ngIf="courseCreateForm.get('url')?.invalid && (courseCreateForm.get('url')?.touched || courseCreateForm.get('url')?.dirty)">
+    <!-- Cuando se tiene más de una validación es necesario inspeccionar cual de ellas es la que detonó el error -->
+    <p class="text-danger mt-2" *ngIf="courseCreateForm.get('url')?.hasError('required')">La URL es un dato requerido</p>
+    <p class="text-danger mt-2" *ngIf="courseCreateForm.get('url')?.hasError('domaininvalid')">La URL al parecer proviene de un dominio no permitido, por ejemplo Amazon</p>
+</ng-container>
 ```

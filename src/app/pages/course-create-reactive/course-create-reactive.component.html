@@ -1,0 +1,58 @@
+
+<div class="container-fluid">
+    <h4>Registrar curso - Formulario Reactivo</h4>
+    <!-- Vincular el template de formulario con nuestro FormGroup
+    Si hay cambios en el modelo, se sincroniza con la vista y viceversa -->
+    <form [formGroup]="courseCreateForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+            <label for="name">Nombre</label>
+            <!-- Las validaciones de cada control se especifica en la definición del estado inicial del formulario, no a nivel de template -->
+            <input type="text" id="name" class="form-control" placeholder="Ingrese nombre del curso" formControlName="name">
+            <!-- Mostrar mensajes de error de validación -->
+            <ng-container *ngIf="courseCreateForm.get('name')?.invalid && (courseCreateForm.get('name')?.touched || courseCreateForm.get('name')?.dirty)">
+                <p class="text-danger mt-2">El nombre es un dato requerido</p>
+            </ng-container>
+        </div>
+        <div class="mb-3">
+            <label for="description">Descripción</label>
+            <!-- Vincular el control de formulario con alguna propiedad definida en el estado inicial del formulario -->
+            <input type="text" id="description" class="form-control" placeholder="Ingrese descripción del curso" formControlName="description">
+            <!-- Validación mediante helpers de tipo getter -->
+            <ng-container *ngIf="description?.invalid && (description?.dirty || description?.touched)">
+                <!-- Cuando se tiene más de una validación es necesario inspeccionar cual de ellas es la que detonó el error -->
+                <p class="text-danger mt-2" *ngIf="description?.hasError('required')">La descripción es un dato requerido</p>
+                <p class="text-danger mt-2" *ngIf="description?.hasError('minlength')">La descripción debe tener al menos 5 caracteres</p>
+                <p class="text-danger mt-2" *ngIf="description?.hasError('maxlength')">La descripción no debe exceder los 100 caracteres</p>
+            </ng-container>
+        </div>
+        <div class="mb-3">
+            <label for="price">Precio</label>
+            <input type="number" id="price" class="form-control" placeholder="Ingrese precio del curso" formControlName="price">
+            <ng-container *ngIf="courseCreateForm.get('price')?.invalid && (courseCreateForm.get('price')?.touched || courseCreateForm.get('price')?.dirty)">
+                <!-- Cuando se tiene más de una validación es necesario inspeccionar cual de ellas es la que detonó el error -->
+                <p class="text-danger mt-2" *ngIf="courseCreateForm.get('price')?.hasError('required')">El precio es un dato requerido</p>
+                <p class="text-danger mt-2" *ngIf="courseCreateForm.get('price')?.hasError('min')">El precio debe ser de al menos $200 pesos</p>
+            </ng-container>
+        </div>
+        <div class="mb-3">
+            <label for="image">URL Imagen</label>
+            <input type="url" id="image" class="form-control" placeholder="Ingrese URL de imagen del curso" formControlName="url">
+            <ng-container *ngIf="courseCreateForm.get('url')?.invalid && (courseCreateForm.get('url')?.touched || courseCreateForm.get('url')?.dirty)">
+                <!-- Cuando se tiene más de una validación es necesario inspeccionar cual de ellas es la que detonó el error -->
+                <p class="text-danger mt-2" *ngIf="courseCreateForm.get('url')?.hasError('required')">La URL es un dato requerido</p>
+                <p class="text-danger mt-2" *ngIf="courseCreateForm.get('url')?.hasError('domaininvalid')">La URL al parecer proviene de un dominio no permitido, por ejemplo Amazon</p>
+            </ng-container>
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="active" formControlName="active">
+            <label class="form-check-label" for="active">Curso Activo</label>
+          </div>
+          <!-- Deshabilitar el botón si el formulario es invalido "ó" si el usuario no ha tocado alguno de sus campos -->
+          <button type="submit" class="btn btn-primary" [disabled]="courseCreateForm.invalid">Registrar curso</button>
+    </form>
+    <div class="my-4">
+        <pre>
+           
+        </pre>
+    </div>
+</div>

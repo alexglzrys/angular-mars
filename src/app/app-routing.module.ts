@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CoursesComponent } from './pages/courses/courses.component';
 import { CourseEditComponent } from './pages/course-edit/course-edit.component';
 import { CourseCreateComponent } from './pages/course-create/course-create.component';
+import { CourseCreateReactiveComponent } from './pages/course-create-reactive/course-create-reactive.component';
 
 const routes: Routes = [
   {
@@ -16,6 +17,10 @@ const routes: Routes = [
   {
     path: 'courses/add',
     component: CourseCreateComponent,
+  },
+  {
+    path: 'courses/add-reactive',
+    component: CourseCreateReactiveComponent
   },
   {
     path: '**',
